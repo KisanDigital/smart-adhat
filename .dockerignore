@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Documentation
+*.md
+PLAN.md
+QUICKSTART.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Batch scripts
+*.bat
+
+# Node modules (will be installed in container)
+**/node_modules
+
+# Build artifacts
+**/target
+**/dist
+**/.angular
+
+# Environment files (use docker-compose env instead)
+**/.env
+**/.env.local
+

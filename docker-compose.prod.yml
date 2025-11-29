@@ -1,0 +1,78 @@
+version: '3.8'
+
+# Production deployment with PostgreSQL database
+# Use this for production with persistent data storage
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: smartadhat-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: smartadhat
+      POSTGRES_USER: smartadhat_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartadhat_secure_password_change_me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - smartadhat-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartadhat_user -d smartadhat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Spring Boot Application (with PostgreSQL)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smartadhat-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_SECRET: ${JWT_SECRET:-c21hcnRhZGhhdHNlY3JldGtleWZvcmp3dHRva2VuZ2VuZXJhdGlvbjIwMjU=}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200,http://localhost}
+      DATABASE_URL: jdbc:postgresql://postgres:5432/smartadhat
+      DATABASE_USERNAME: smartadhat_user
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-smartadhat_secure_password_change_me}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - smartadhat-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Frontend Angular Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smartadhat-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - smartadhat-network
+
+networks:
+  smartadhat-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+
