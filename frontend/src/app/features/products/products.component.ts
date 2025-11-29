@@ -42,12 +42,23 @@ import { Product, ProductCategory } from '../../core/models/product.model';
               <select formControlName="category"
                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                 <option value="">Select Category</option>
-                <option value="GRAIN">Grain / अनाज</option>
-                <option value="PULSE">Pulse / दाल</option>
-                <option value="OILSEED">Oilseed / तिलहन</option>
-                <option value="VEGETABLE">Vegetable / सब्जी</option>
-                <option value="FRUIT">Fruit / फल</option>
-                <option value="SPICE">Spice / मसाला</option>
+                <option value="WHEAT">Wheat / गेहूं</option>
+                <option value="RICE">Rice / चावल</option>
+                <option value="PULSES">Pulses / दालें</option>
+                <option value="SARSO">Sarso / सरसों</option>
+                <option value="BARLEY">Barley / जौ</option>
+                <option value="CORN">Corn / मक्का</option>
+                <option value="BAJRA">Bajra / बाजरा</option>
+                <option value="JOWAR">Jowar / ज्वार</option>
+                <option value="GRAM">Gram / चना</option>
+                <option value="MOONG">Moong / मूंग</option>
+                <option value="MASOOR">Masoor / मसूर</option>
+                <option value="ARHAR">Arhar / अरहर</option>
+                <option value="URAD">Urad / उड़द</option>
+                <option value="SOYBEAN">Soybean / सोयाबीन</option>
+                <option value="GROUNDNUT">Groundnut / मूंगफली</option>
+                <option value="COTTON">Cotton / कपास</option>
+                <option value="SUGARCANE">Sugarcane / गन्ना</option>
                 <option value="OTHER">Other / अन्य</option>
               </select>
             </div>
@@ -189,17 +200,27 @@ export class ProductsComponent implements OnInit {
 
   getCategoryClass(category: ProductCategory): string {
     switch (category) {
-      case ProductCategory.GRAIN:
+      case ProductCategory.WHEAT:
+      case ProductCategory.RICE:
+      case ProductCategory.BARLEY:
+      case ProductCategory.CORN:
+      case ProductCategory.BAJRA:
+      case ProductCategory.JOWAR:
         return 'bg-green-100 text-green-800';
-      case ProductCategory.PULSE:
+      case ProductCategory.PULSES:
+      case ProductCategory.GRAM:
+      case ProductCategory.MOONG:
+      case ProductCategory.MASOOR:
+      case ProductCategory.ARHAR:
+      case ProductCategory.URAD:
         return 'bg-yellow-100 text-yellow-800';
-      case ProductCategory.OILSEED:
+      case ProductCategory.SARSO:
+      case ProductCategory.SOYBEAN:
+      case ProductCategory.GROUNDNUT:
         return 'bg-purple-100 text-purple-800';
-      case ProductCategory.VEGETABLE:
+      case ProductCategory.COTTON:
         return 'bg-blue-100 text-blue-800';
-      case ProductCategory.FRUIT:
-        return 'bg-red-100 text-red-800';
-      case ProductCategory.SPICE:
+      case ProductCategory.SUGARCANE:
         return 'bg-orange-100 text-orange-800';
       case ProductCategory.OTHER:
         return 'bg-gray-100 text-gray-800';

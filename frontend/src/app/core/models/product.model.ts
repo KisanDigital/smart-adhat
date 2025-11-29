@@ -7,15 +7,38 @@ export interface Product {
   description?: string;
   imageUrl?: string;
   active: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ProductRequest {
+  name: string;
+  nameHindi: string;
+  category: ProductCategory;
+  unit: Unit;
+  description?: string;
+  imageUrl?: string;
+  active?: boolean;
 }
 
 export enum ProductCategory {
-  GRAIN = 'GRAIN',
-  PULSE = 'PULSE',
-  OILSEED = 'OILSEED',
-  VEGETABLE = 'VEGETABLE',
-  FRUIT = 'FRUIT',
-  SPICE = 'SPICE',
+  WHEAT = 'WHEAT',
+  RICE = 'RICE',
+  PULSES = 'PULSES',
+  SARSO = 'SARSO',
+  BARLEY = 'BARLEY',
+  CORN = 'CORN',
+  BAJRA = 'BAJRA',
+  JOWAR = 'JOWAR',
+  GRAM = 'GRAM',
+  MOONG = 'MOONG',
+  MASOOR = 'MASOOR',
+  ARHAR = 'ARHAR',
+  URAD = 'URAD',
+  SOYBEAN = 'SOYBEAN',
+  GROUNDNUT = 'GROUNDNUT',
+  COTTON = 'COTTON',
+  SUGARCANE = 'SUGARCANE',
   OTHER = 'OTHER'
 }
 

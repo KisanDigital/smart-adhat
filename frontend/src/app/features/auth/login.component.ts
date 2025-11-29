@@ -28,7 +28,7 @@ import { AuthService } from '../../core/services/auth.service';
                 <h3 class="text-sm font-semibold text-blue-800 mb-2">Demo Login Credentials</h3>
                 <div class="text-xs text-blue-700 space-y-1">
                   <p><strong>Username:</strong> ram, vijay, or suresh</p>
-                  <p><strong>Password:</strong> password123</p>
+                  <p><strong>Password:</strong> admin123</p>
                 </div>
                 <button
                   type="button"
@@ -121,7 +121,7 @@ export class LoginComponent {
   fillDemoCredentials(): void {
     this.loginForm.patchValue({
       username: 'ram',
-      password: 'password123'
+      password: 'admin123'
     });
   }
 

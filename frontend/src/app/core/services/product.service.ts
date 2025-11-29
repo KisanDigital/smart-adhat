@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product, ProductCategory } from '../models/product.model';
+import { Product, ProductRequest } from '../models/product.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
+  private apiUrl = `${environment.apiUrl}/products`;
+
   constructor(private http: HttpClient) {}
 
   getAllProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${environment.apiUrl}/products`);
+    return this.http.get<Product[]>(this.apiUrl);
   }
 
   getProducts(): Observable<Product[]> {
@@ -19,14 +21,22 @@ export class ProductService {
   }
 
   getProductById(id: number): Observable<Product> {
-    return this.http.get<Product>(`${environment.apiUrl}/products/${id}`);
+    return this.http.get<Product>(`${this.apiUrl}/${id}`);
   }
 
-  getProductsByCategory(category: ProductCategory): Observable<Product[]> {
-    return this.http.get<Product[]>(`${environment.apiUrl}/products/category/${category}`);
+  getProductsByCategoryId(categoryId: number): Observable<Product[]> {
+    return this.http.get<Product[]>(`${this.apiUrl}/category/${categoryId}`);
   }
 
-  createProduct(product: any): Observable<Product> {
-    return this.http.post<Product>(`${environment.apiUrl}/products`, product);
+  createProduct(product: ProductRequest): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, product);
+  }
+
+  updateProduct(id: number, product: ProductRequest): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
+  }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
