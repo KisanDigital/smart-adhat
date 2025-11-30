@@ -1,7 +1,7 @@
 package com.smartadhat.service;
 
+import com.smartadhat.model.Category;
 import com.smartadhat.model.Product;
-import com.smartadhat.model.ProductCategory;
 import com.smartadhat.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
-    public List<Product> getProductsByCategory(ProductCategory category) {
+    public List<Product> getProductsByCategory(Category category) {
         return productRepository.findByCategoryAndActiveTrue(category);
     }
 

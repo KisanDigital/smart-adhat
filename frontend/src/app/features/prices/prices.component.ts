@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
+import { PriceService } from '../../core/services/price.service';
 import { Product } from '../../core/models/product.model';
+import { Price, PriceRequest } from '../../core/models/price.model';
 
 @Component({
   selector: 'app-prices',
@@ -105,24 +107,24 @@ import { Product } from '../../core/models/product.model';
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                   <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {{ product.category }}
+                    {{ product.category.name }} / {{ product.category.nameHindi }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-700">
                   {{ product.unit }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-purple-600">
-                  ₹{{ getRandomBuyPrice() | number:'1.2-2' }}
+                  ₹{{ getBuyPrice(product.id) | number:'1.2-2' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-orange-600">
-                  ₹{{ getRandomSellPrice() | number:'1.2-2' }}
+                  ₹{{ getSellPrice(product.id) | number:'1.2-2' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-green-600">
-                  ₹{{ (getRandomSellPrice() - getRandomBuyPrice()) | number:'1.2-2' }}
+                  ₹{{ getProductProfit(product.id) | number:'1.2-2' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                   <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    {{ (((getRandomSellPrice() - getRandomBuyPrice()) / getRandomBuyPrice()) * 100) | number:'1.1-1' }}%
+                    {{ getProductMargin(product.id) | number:'1.1-1' }}%
                   </span>
                 </td>
               </tr>
@@ -151,13 +153,15 @@ import { Product } from '../../core/models/product.model';
 export class PricesComponent implements OnInit {
   priceForm: FormGroup;
   products: Product[] = [];
+  prices: Price[] = [];
   showForm = false;
   isLoading = false;
   errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
-    private productService: ProductService
+    private productService: ProductService,
+    private priceService: PriceService
   ) {
     this.priceForm = this.fb.group({
       productId: ['', Validators.required],
@@ -168,17 +172,29 @@ export class PricesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadPrices();
   }
 
   loadProducts(): void {
-    this.isLoading = true;
     this.productService.getProducts().subscribe({
       next: (data: any) => {
         this.products = data;
-        this.isLoading = false;
       },
       error: (error: any) => {
         console.error('Error loading products:', error);
+      }
+    });
+  }
+
+  loadPrices(): void {
+    this.isLoading = true;
+    this.priceService.getMyPrices().subscribe({
+      next: (data: Price[]) => {
+        this.prices = data;
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        console.error('Error loading prices:', error);
         this.isLoading = false;
       }
     });
@@ -196,13 +212,26 @@ export class PricesComponent implements OnInit {
     return (this.getProfit() / buyPrice) * 100;
   }
 
-  // Temporary method to show sample prices (in real app, fetch from Price entity)
-  getRandomBuyPrice(): number {
-    return 1500 + Math.random() * 500;
+  getBuyPrice(productId: number): number {
+    const price = this.prices.find(p => p.productId === productId);
+    return price ? price.buyingPrice : 0;
   }
 
-  getRandomSellPrice(): number {
-    return 1600 + Math.random() * 600;
+  getSellPrice(productId: number): number {
+    const price = this.prices.find(p => p.productId === productId);
+    return price ? price.sellingPrice : 0;
+  }
+
+  getProductProfit(productId: number): number {
+    const buyPrice = this.getBuyPrice(productId);
+    const sellPrice = this.getSellPrice(productId);
+    return sellPrice - buyPrice;
+  }
+
+  getProductMargin(productId: number): number {
+    const buyPrice = this.getBuyPrice(productId);
+    if (buyPrice === 0) return 0;
+    return (this.getProductProfit(productId) / buyPrice) * 100;
   }
 
   onSubmit(): void {
@@ -210,14 +239,25 @@ export class PricesComponent implements OnInit {
       this.isLoading = true;
       this.errorMessage = '';
 
-      // In production, this would call a price service
-      console.log('Price update:', this.priceForm.value);
+      const priceRequest: PriceRequest = {
+        productId: Number(this.priceForm.value.productId),
+        buyingPrice: Number(this.priceForm.value.buyingPrice),
+        sellingPrice: Number(this.priceForm.value.sellingPrice),
+        effectiveDate: new Date().toISOString().split('T')[0]
+      };
 
-      setTimeout(() => {
-        this.isLoading = false;
-        this.resetForm();
-        this.showForm = false;
-      }, 1000);
+      this.priceService.createOrUpdatePrice(priceRequest).subscribe({
+        next: (response: Price) => {
+          this.isLoading = false;
+          this.resetForm();
+          this.loadPrices();
+          this.showForm = false;
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          this.errorMessage = error.error?.message || 'Failed to update price';
+        }
+      });
     }
   }
 

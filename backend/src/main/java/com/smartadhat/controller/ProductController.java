@@ -1,7 +1,8 @@
 package com.smartadhat.controller;
 
+import com.smartadhat.model.Category;
 import com.smartadhat.model.Product;
-import com.smartadhat.model.ProductCategory;
+import com.smartadhat.service.CategoryService;
 import com.smartadhat.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
@@ -26,8 +28,9 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @GetMapping("/category/{category}")
-    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable ProductCategory category) {
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Long categoryId) {
+        Category category = categoryService.getCategoryById(categoryId);
         return ResponseEntity.ok(productService.getProductsByCategory(category));
     }
 

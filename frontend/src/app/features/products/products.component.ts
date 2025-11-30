@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
-import { Product, ProductCategory } from '../../core/models/product.model';
+import { CategoryService } from '../../core/services/category.service';
+import { Product } from '../../core/models/product.model';
+import { Category } from '../../core/models/category.model';
 
 @Component({
   selector: 'app-products',
@@ -42,24 +44,9 @@ import { Product, ProductCategory } from '../../core/models/product.model';
               <select formControlName="category"
                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                 <option value="">Select Category</option>
-                <option value="WHEAT">Wheat / गेहूं</option>
-                <option value="RICE">Rice / चावल</option>
-                <option value="PULSES">Pulses / दालें</option>
-                <option value="SARSO">Sarso / सरसों</option>
-                <option value="BARLEY">Barley / जौ</option>
-                <option value="CORN">Corn / मक्का</option>
-                <option value="BAJRA">Bajra / बाजरा</option>
-                <option value="JOWAR">Jowar / ज्वार</option>
-                <option value="GRAM">Gram / चना</option>
-                <option value="MOONG">Moong / मूंग</option>
-                <option value="MASOOR">Masoor / मसूर</option>
-                <option value="ARHAR">Arhar / अरहर</option>
-                <option value="URAD">Urad / उड़द</option>
-                <option value="SOYBEAN">Soybean / सोयाबीन</option>
-                <option value="GROUNDNUT">Groundnut / मूंगफली</option>
-                <option value="COTTON">Cotton / कपास</option>
-                <option value="SUGARCANE">Sugarcane / गन्ना</option>
-                <option value="OTHER">Other / अन्य</option>
+                <option *ngFor="let cat of categories" [value]="cat.id">
+                  {{ cat.name }} / {{ cat.nameHindi }}
+                </option>
               </select>
             </div>
 
@@ -111,8 +98,8 @@ import { Product, ProductCategory } from '../../core/models/product.model';
               <p class="text-gray-600">{{ product.nameHindi }}</p>
             </div>
             <span class="px-3 py-1 text-xs font-semibold rounded-full"
-                  [ngClass]="getCategoryClass(product.category)">
-              {{ product.category }}
+                  [ngClass]="getCategoryClass(product.category.name)">
+              {{ product.category.name }} / {{ product.category.nameHindi }}
             </span>
           </div>
 
@@ -137,13 +124,15 @@ import { Product, ProductCategory } from '../../core/models/product.model';
 export class ProductsComponent implements OnInit {
   productForm: FormGroup;
   products: Product[] = [];
+  categories: Category[] = [];
   showForm = false;
   isLoading = false;
   errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
-    private productService: ProductService
+    private productService: ProductService,
+    private categoryService: CategoryService
   ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
@@ -157,6 +146,18 @@ export class ProductsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadCategories();
+  }
+
+  loadCategories(): void {
+    this.categoryService.getActiveCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
   }
 
   loadProducts(): void {
@@ -173,12 +174,43 @@ export class ProductsComponent implements OnInit {
     });
   }
 
+  getCategoryClass(categoryName: string): string {
+    // Dynamic color assignment based on category name
+    // This works with any category from the database, not just hardcoded enums
+    const colorPalette = [
+      'bg-amber-100 text-amber-800',
+      'bg-green-100 text-green-800',
+      'bg-blue-100 text-blue-800',
+      'bg-purple-100 text-purple-800',
+      'bg-pink-100 text-pink-800',
+      'bg-indigo-100 text-indigo-800',
+      'bg-yellow-100 text-yellow-800',
+      'bg-orange-100 text-orange-800',
+      'bg-teal-100 text-teal-800',
+      'bg-cyan-100 text-cyan-800'
+    ];
+
+    // Generate consistent color based on category name hash
+    let hash = 0;
+    for (let i = 0; i < categoryName.length; i++) {
+      hash = categoryName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % colorPalette.length;
+
+    return colorPalette[index];
+  }
+
   onSubmit(): void {
     if (this.productForm.valid) {
       this.isLoading = true;
       this.errorMessage = '';
 
-      this.productService.createProduct(this.productForm.value).subscribe({
+      const formData = {
+        ...this.productForm.value,
+        category: { id: Number(this.productForm.value.category) }
+      };
+
+      this.productService.createProduct(formData).subscribe({
         next: (response: any) => {
           this.isLoading = false;
           this.resetForm();
@@ -196,36 +228,5 @@ export class ProductsComponent implements OnInit {
   resetForm(): void {
     this.productForm.reset({ active: true });
     this.errorMessage = '';
-  }
-
-  getCategoryClass(category: ProductCategory): string {
-    switch (category) {
-      case ProductCategory.WHEAT:
-      case ProductCategory.RICE:
-      case ProductCategory.BARLEY:
-      case ProductCategory.CORN:
-      case ProductCategory.BAJRA:
-      case ProductCategory.JOWAR:
-        return 'bg-green-100 text-green-800';
-      case ProductCategory.PULSES:
-      case ProductCategory.GRAM:
-      case ProductCategory.MOONG:
-      case ProductCategory.MASOOR:
-      case ProductCategory.ARHAR:
-      case ProductCategory.URAD:
-        return 'bg-yellow-100 text-yellow-800';
-      case ProductCategory.SARSO:
-      case ProductCategory.SOYBEAN:
-      case ProductCategory.GROUNDNUT:
-        return 'bg-purple-100 text-purple-800';
-      case ProductCategory.COTTON:
-        return 'bg-blue-100 text-blue-800';
-      case ProductCategory.SUGARCANE:
-        return 'bg-orange-100 text-orange-800';
-      case ProductCategory.OTHER:
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
   }
 }
