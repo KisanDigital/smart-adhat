@@ -64,9 +64,8 @@ import { Inventory } from '../../core/models/inventory.model';
                   <div class="text-sm text-gray-500">{{ item.product.nameHindi }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {{ item.product.category }}
-                  </span>
+                  <div class="font-medium text-gray-900">{{ item.product.category.name }}</div>
+                  <div class="text-sm text-gray-500">{{ item.product.category.nameHindi }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right">
                   <div class="text-sm font-semibold text-gray-900">{{ item.quantity | number:'1.2-2' }}</div>
