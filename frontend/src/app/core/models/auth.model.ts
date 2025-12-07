@@ -6,6 +6,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
   username: string;
   password: string;
+  registrationSecret: string;
   shopName: string;
   ownerName: string;
   phone: string;

@@ -17,6 +17,9 @@ public class RegisterRequest {
     private String password;
 
     @NotBlank
+    private String registrationSecret;
+
+    @NotBlank
     private String shopName;
 
     @NotBlank

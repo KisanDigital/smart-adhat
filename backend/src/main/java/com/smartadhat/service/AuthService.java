@@ -24,6 +24,16 @@ public class AuthService {
 
     @Transactional
     public LoginResponse register(RegisterRequest request) {
+        // Validate registration secret
+        String requiredSecret = System.getenv("REGISTRATION_SECRET");
+        if (requiredSecret == null || requiredSecret.isEmpty()) {
+            requiredSecret = "smartadhat2025"; // Default secret
+        }
+        
+        if (!requiredSecret.equals(request.getRegistrationSecret())) {
+            throw new RuntimeException("Invalid registration secret");
+        }
+        
         if (adhatRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
         }

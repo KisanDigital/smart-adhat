@@ -64,6 +64,18 @@ import { AuthService } from '../../core/services/auth.service';
               </div>
 
               <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Registration Secret * 🔐</label>
+                <input type="password" formControlName="registrationSecret"
+                       class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+                       [class.border-red-300]="registerForm.get('registrationSecret')?.invalid && registerForm.get('registrationSecret')?.touched"
+                       [class.border-gray-300]="!registerForm.get('registrationSecret')?.invalid || !registerForm.get('registrationSecret')?.touched"
+                       placeholder="Enter registration secret word"/>
+                <div *ngIf="registerForm.get('registrationSecret')?.invalid && registerForm.get('registrationSecret')?.touched"
+                     class="text-red-500 text-xs mt-1">Registration secret required</div>
+                <div class="text-xs text-gray-500 mt-1">Contact admin for registration secret</div>
+              </div>
+
+              <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number * (10 digits)</label>
                 <input type="text" formControlName="phone"
                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
@@ -143,6 +155,7 @@ import { AuthService } from '../../core/services/auth.service';
                 <li *ngIf="registerForm.get('ownerName')?.invalid">Owner Name</li>
                 <li *ngIf="registerForm.get('username')?.invalid">Username</li>
                 <li *ngIf="registerForm.get('password')?.invalid">Password (minimum 6 characters)</li>
+                <li *ngIf="registerForm.get('registrationSecret')?.invalid">Registration Secret</li>
                 <li *ngIf="registerForm.get('phone')?.invalid">Phone Number (10 digits)</li>
                 <li *ngIf="registerForm.get('address')?.invalid">Address</li>
                 <li *ngIf="registerForm.get('city')?.invalid">City</li>
@@ -191,6 +204,7 @@ export class RegisterComponent {
       ownerName: ['', Validators.required],
       username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      registrationSecret: ['', Validators.required],
       phone: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       email: ['', Validators.email],
       address: ['', Validators.required],

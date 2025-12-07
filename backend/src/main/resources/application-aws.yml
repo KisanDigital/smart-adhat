@@ -1,0 +1,39 @@
+server:
+  port: 5000  # Elastic Beanstalk expects port 5000
+
+spring:
+  application:
+    name: smart-adhat-backend
+  
+  datasource:
+    url: jdbc:h2:mem:smartadhat
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  h2:
+    console:
+      enabled: false  # Security: Disable H2 console in AWS
+  
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false  # Disable SQL logging in production
+    defer-datasource-initialization: true
+  
+  sql:
+    init:
+      mode: always
+
+logging:
+  level:
+    root: INFO
+    com.smartadhat: INFO
+    org.springframework.security: WARN
+
+jwt:
+  secret: ${JWT_SECRET:please-change-this-to-a-very-long-random-secure-key-at-least-256-bits}
+  expiration: 86400000  # 24 hours
+
+cors:
+  allowed-origins: ${CORS_ORIGINS:https://your-cloudfront-domain.cloudfront.net}

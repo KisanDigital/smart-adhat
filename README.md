@@ -2,6 +2,29 @@
 
 A comprehensive digital platform to help Adhat (commission agents) manage their inventory, pricing, and transactions digitally - replacing traditional "bahi-khata" (ledger books).
 
+## 🚀 AWS Deployment
+
+All deployment scripts are organized in the `deployment` folder. See [deployment/README.md](deployment/README.md) for detailed instructions.
+
+### Quick Deploy
+```powershell
+cd deployment
+
+# First time setup
+.\1-setup-s3.ps1
+.\2-setup-cloudfront.ps1
+.\3-setup-backend.ps1
+.\4-setup-api-gateway.ps1
+.\5-build-deploy.ps1
+
+# Update application
+.\5-build-deploy.ps1
+```
+
+**Cost**: ~$8-12/month | **Security**: Private S3 + Backend, HTTPS everywhere
+
+---
+
 ## 🌟 Features
 
 ### Core Features
